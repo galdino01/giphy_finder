@@ -9,6 +9,7 @@ final _apiKey = dotenv.get('GIPHY_API_KEY', fallback: null);
 const String _giphyUrl = 'https://api.giphy.com/v1/gifs';
 const String _giphyDevelopers =
     'https://developers.giphy.com/branch/master/static/header-logo-0fec0225d189bc0eae27dac3e3770582.gif';
+int _offset = 0;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,7 +20,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _search;
-  final int _offset = 0;
 
   Future<Map> _getGifs() async {
     http.Response response;
@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
       response = await http.get(Uri.parse(uriTrending));
     } else {
       final String uriSearch =
-          '$_giphyUrl/search?api_key=$_apiKey&q=$_search&limit=20&offset=$_offset&rating=g&lang=en';
+          '$_giphyUrl/search?api_key=$_apiKey&q=$_search&limit=19&offset=$_offset&rating=g&lang=en';
 
       response = await http.get(Uri.parse(uriSearch));
     }
@@ -55,21 +55,27 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.black,
       body: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(10),
+          Padding(
+            padding: const EdgeInsets.all(10),
             child: TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Pesquise Aqui',
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
                 border: OutlineInputBorder(),
               ),
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
               ),
               textAlign: TextAlign.center,
+              onSubmitted: (text) {
+                setState(() {
+                  _search = text;
+                  _offset = 0;
+                });
+              },
             ),
           ),
           Expanded(
@@ -103,6 +109,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  int _getCount(List data) {
+    if (_search == null) {
+      return data.length;
+    } else {
+      return data.length + 1;
+    }
+  }
+
   Widget _createGifTable(BuildContext context, AsyncSnapshot snapshot) {
     return GridView.builder(
       padding: const EdgeInsets.all(10),
@@ -111,15 +125,43 @@ class _HomePageState extends State<HomePage> {
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
-      itemCount: snapshot.data['data'].length,
+      itemCount: _getCount(snapshot.data['data']),
       itemBuilder: (context, index) {
-        return GestureDetector(
-          child: Image.network(
-            snapshot.data['data'][index]['images']['fixed_height']['url'],
-            height: 300.0,
-            fit: BoxFit.cover,
-          ),
-        );
+        if (_search == null || index < snapshot.data['data'].length) {
+          return GestureDetector(
+            child: Image.network(
+              snapshot.data['data'][index]['images']['fixed_height']['url'],
+              height: 300.0,
+              fit: BoxFit.cover,
+            ),
+          );
+        } else {
+          return Container(
+            child: GestureDetector(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 70,
+                    ),
+                    Text(
+                      'Carregar mais...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    )
+                  ]),
+              onTap: () {
+                setState(() {
+                  _offset += 19;
+                });
+              },
+            ),
+          );
+        }
       },
     );
   }
