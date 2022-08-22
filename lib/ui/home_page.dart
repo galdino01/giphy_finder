@@ -1,10 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:giphy_finder/ui/gif_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:share_plus/share_plus.dart';
 
 final _apiKey = dotenv.get('GIPHY_API_KEY', fallback: null);
 const String _giphyUrl = 'https://api.giphy.com/v1/gifs';
@@ -65,6 +64,9 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.white,
                 ),
                 border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white, width: 2),
+                ),
               ),
               style: const TextStyle(
                 color: Colors.white,
@@ -144,6 +146,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               );
+            },
+            onLongPress: () {
+              Share.share(snapshot.data['data'][index]['images']['fixed_height']
+                  ['url']);
             },
           );
         } else {
