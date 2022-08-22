@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:giphy_finder/ui/gif_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 final _apiKey = dotenv.get('GIPHY_API_KEY', fallback: null);
 const String _giphyUrl = 'https://api.giphy.com/v1/gifs';
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   int _getCount(List data) {
-    if (_search == null) {
+    if (_search.isEmpty) {
       return data.length;
     } else {
       return data.length + 1;
@@ -130,10 +131,12 @@ class _HomePageState extends State<HomePage> {
       ),
       itemCount: _getCount(snapshot.data['data']),
       itemBuilder: (context, index) {
-        if (_search == null || index < snapshot.data['data'].length) {
+        if (_search.isEmpty || index < snapshot.data['data'].length) {
           return GestureDetector(
-            child: Image.network(
-              snapshot.data['data'][index]['images']['fixed_height']['url'],
+            child: FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: snapshot.data['data'][index]['images']['fixed_height']
+                  ['url'],
               height: 300.0,
               fit: BoxFit.cover,
             ),
