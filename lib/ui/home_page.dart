@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:giphy_finder/ui/gif_page.dart';
 import 'package:http/http.dart' as http;
 
 final _apiKey = dotenv.get('GIPHY_API_KEY', fallback: null);
@@ -134,32 +135,40 @@ class _HomePageState extends State<HomePage> {
               height: 300.0,
               fit: BoxFit.cover,
             ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GifPage(
+                    gifData: snapshot.data['data'][index],
+                  ),
+                ),
+              );
+            },
           );
         } else {
-          return Container(
-            child: GestureDetector(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
-                      Icons.add,
+          return GestureDetector(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 70,
+                  ),
+                  Text(
+                    'Carregar mais...',
+                    style: TextStyle(
                       color: Colors.white,
-                      size: 70,
+                      fontSize: 20,
                     ),
-                    Text(
-                      'Carregar mais...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    )
-                  ]),
-              onTap: () {
-                setState(() {
-                  _offset += 19;
-                });
-              },
-            ),
+                  )
+                ]),
+            onTap: () {
+              setState(() {
+                _offset += 19;
+              });
+            },
           );
         }
       },
