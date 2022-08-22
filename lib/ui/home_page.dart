@@ -19,12 +19,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? _search;
+  String _search = '';
 
   Future<Map> _getGifs() async {
     http.Response response;
 
-    if (_search == null) {
+    if (_search.isEmpty) {
       final String uriTrending =
           '$_giphyUrl/trending?api_key=$_apiKey&limit=20&rating=g';
 
