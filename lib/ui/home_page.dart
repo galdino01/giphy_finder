@@ -26,12 +26,12 @@ class _HomePageState extends State<HomePage> {
 
     if (_search == null) {
       final String uriTrending =
-          '$_giphyUrl/trending?api_key=$_apiKey&limit=25&rating=g';
+          '$_giphyUrl/trending?api_key=$_apiKey&limit=20&rating=g';
 
       response = await http.get(Uri.parse(uriTrending));
     } else {
       final String uriSearch =
-          '$_giphyUrl/search?api_key=$_apiKey&q=$_search&limit=25&offset=$_offset&rating=g&lang=en';
+          '$_giphyUrl/search?api_key=$_apiKey&q=$_search&limit=20&offset=$_offset&rating=g&lang=en';
 
       response = await http.get(Uri.parse(uriSearch));
     }
@@ -42,10 +42,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    _getGifs().then((map) {
-      print(map);
-    });
   }
 
   @override
@@ -107,5 +103,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _createGifTable(BuildContext context, AsyncSnapshot snapshot) {}
+  Widget _createGifTable(BuildContext context, AsyncSnapshot snapshot) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(10),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: snapshot.data['data'].length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          child: Image.network(
+            snapshot.data['data'][index]['images']['fixed_height']['url'],
+            height: 300.0,
+            fit: BoxFit.cover,
+          ),
+        );
+      },
+    );
+  }
 }
